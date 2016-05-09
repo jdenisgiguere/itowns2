@@ -8,8 +8,8 @@ define('Tiles/FeatureTile',[
 	'Core/defaultValue',
     'Scene/BoundingBox',
 	'Renderer/NodeMesh',
-    'Renderer/BasicMaterial',
-    'THREE'], function(defaultValue, BoundingBox, NodeMesh, BasicMaterial, THREE){
+    'Renderer/OutlineMaterial',
+    'THREE'], function(defaultValue, BoundingBox, NodeMesh, OutlineMaterial, THREE){
 
 	function FeatureTile(params){
         //Constructor
@@ -23,7 +23,7 @@ define('Tiles/FeatureTile',[
             (params.bbox[3] - params.bbox[1])) / 100;
         // TODO: geometric error doesn't really make sense in our case
 
-        this.material = new BasicMaterial(new THREE.Color(0.8,0.8,0.8));
+        this.material = new OutlineMaterial(new THREE.Color(0.8,0.8,0.8));
 
 		this.updateGeometry = true;
     }
