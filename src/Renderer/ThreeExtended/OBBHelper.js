@@ -26,6 +26,8 @@ function OBBHelper(OBB, text) {
         color: color.getHex(),
     }));
 
+    this.frustumCulled = false;
+
     var size = OBB.box3D.getSize();
 
     var geometryText = new THREE.TextGeometry(text, {
@@ -43,6 +45,7 @@ function OBBHelper(OBB, text) {
     }));
 
     this.add(this.textMesh);
+    this.textMesh.frustumCulled = false;
 
     if (OBB !== undefined)
       { this.update(OBB); }
@@ -104,5 +107,44 @@ OBBHelper.prototype.update = function update(OBB) {
         this.textMesh.translateZ(size.z * 0.5);
     }
 };
+
+export function addOBBLayer(layer, scene) {
+    const obb_layer_id = `${layer.id}_obb_debug`;
+
+    const debugIdUpdate = function debugIdUpdate(context, layer, node) {
+        var n = node.children.filter(n => n.layer == obb_layer_id);
+
+        if (node.material.visible) {
+            if (n.length == 0) {
+                const helper = new OBBHelper(node.OBB(), `id:${node.id}`);
+                helper.layer = obb_layer_id;
+                const l3js = context.scene.layersConfiguration.getLayerAttribute(obb_layer_id, 'threejsLayer');
+                helper.layers.set(l3js);
+                helper.children[0].layers.set(l3js);
+                node.add(helper);
+                helper.updateMatrixWorld(true);
+
+                n = helper;
+            } else {
+                n = n[0];
+            }
+
+            n.setMaterialVisibility(true);
+        } else if (n.length > 0) {
+            n[0].setMaterialVisibility(false);
+        }
+    };
+
+    const debugLayer = {
+        id: obb_layer_id,
+        update: debugIdUpdate,
+    };
+
+    scene.addLayer(debugLayer, layer.id);
+    scene.currentCamera().camera3D.layers.disable(
+        scene.layersConfiguration.getLayerAttribute(debugLayer.id, 'threejsLayer'));
+    return debugLayer;
+}
+
 
 export default OBBHelper;

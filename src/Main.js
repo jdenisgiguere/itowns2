@@ -5,11 +5,18 @@
  */
 
 import ApiGlobe from './Core/Commander/Interfaces/ApiInterface/ApiGlobe';
+import { addOBBLayer } from './Renderer/ThreeExtended/OBBHelper';
+
 // browser execution or not ?
 const scope = typeof window !== 'undefined' ? window : {};
 const itowns = scope.itowns || {
     viewer: new ApiGlobe(),
+    // debug
+    obb: {
+        addHelper: addOBBLayer,
+    },
 };
 scope.itowns = itowns;
 export const viewer = itowns.viewer;
+export const obb = itowns.obb;
 export default scope.itowns;

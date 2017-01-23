@@ -178,16 +178,16 @@ function Debug(scene) {
     };
 
     // DEBUG CONTROLS
-    const gui = menuGlobe.gui.addFolder('Debug Tools');
+    this.gui = menuGlobe.gui.addFolder('Debug Tools');
 
-    const state = {
+    this.state = {
         showOutline: false,
         wireframe: false,
         displayCharts: false,
     };
 
     // charts
-    gui.add(state, 'displayCharts').name('Display charts').onChange((newValue) => {
+    this.gui.add(this.state, 'displayCharts').name('Display charts').onChange((newValue) => {
         if (newValue) {
             chartDiv.style.display = 'flex';
         } else {
@@ -205,7 +205,7 @@ function Debug(scene) {
     }
 
     // tiles outline
-    gui.add(state, 'showOutline').name('Show tiles outline').onChange((newValue) => {
+    this.gui.add(this.state, 'showOutline').name('Show tiles outline').onChange((newValue) => {
         scene.layersConfiguration.traverseLayers((layer) => {
             layer.showOutline = newValue;
         });
@@ -216,7 +216,7 @@ function Debug(scene) {
     });
 
     // tiles wireframe
-    gui.add(state, 'wireframe').name('Wireframe').onChange((newValue) => {
+    this.gui.add(this.state, 'wireframe').name('Wireframe').onChange((newValue) => {
         scene.layersConfiguration.traverseLayers((layer) => {
             layer.wireframe = newValue;
         });
@@ -224,5 +224,27 @@ function Debug(scene) {
             material.wireframe = newValue;
         });
     });
+
+    // tiles bounding box
+    const geometries = scene.layersConfiguration.getLayers((layer, attr) => attr.threejsLayer != undefined);
+    for (const layer of geometries) {
+        this.addGeometryVisibilityCheckbox(layer, scene);
+    }
 }
+
+Debug.prototype.addGeometryVisibilityCheckbox = function addGeometryVisibilityCheckbox(layer, scene) {
+    const val = scene.layersConfiguration.getLayerAttribute(layer.id, 'threejsLayer');
+    const enabled = scene.currentCamera().camera3D.layers.test({ mask: 1 << val });
+    this.state[layer.id] = enabled;
+
+    this.gui.add(this.state, layer.id).name(`${layer.id} visibility`).onChange((newValue) => {
+        if (newValue) {
+            scene.currentCamera().camera3D.layers.enable(val);
+        } else {
+            scene.currentCamera().camera3D.layers.disable(val);
+        }
+        scene.notifyChange();
+    });
+};
+
 window.Debug = Debug;

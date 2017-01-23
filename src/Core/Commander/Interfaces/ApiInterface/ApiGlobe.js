@@ -23,6 +23,7 @@ import TileMesh from '../../../../Globe/TileMesh';
 import Atmosphere from '../../../../Globe/Atmosphere';
 import Clouds from '../../../../Globe/Clouds';
 import CoordStars from '../../../../Core/Geographic/CoordStars';
+import { addOBBLayer } from '../../../../Renderer/ThreeExtended/OBBHelper';
 
 var sceneIsLoaded = false;
 var eventLoaded = new CustomEvent('globe-loaded');
@@ -96,6 +97,10 @@ function preprocessLayer(layer, provider) {
         layer.updateStrategy = {
             type: STRATEGY_MIN_NETWORK_TRAFFIC,
         };
+    }
+
+    if (!provider) {
+        return;
     }
 
     if (provider.tileInsideLimit) {
@@ -447,6 +452,12 @@ ApiGlobe.prototype.createSceneGlobe = function createSceneGlobe(globeLayerId, co
     this.clouds = new Clouds();
     this.atmosphere.add(this.clouds);
     this.scene.gfxEngine.scene3D.add(this.atmosphere);
+
+    this.addGeometryLayer(wgs84TileLayer);
+
+    if (__DEBUG__) {
+        addOBBLayer(wgs84TileLayer, this.scene);
+    }
 
     return wgs84TileLayer;
 };
