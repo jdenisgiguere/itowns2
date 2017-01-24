@@ -24,6 +24,7 @@ import Atmosphere from '../../../../Globe/Atmosphere';
 import Clouds from '../../../../Globe/Clouds';
 import CoordStars from '../../../../Core/Geographic/CoordStars';
 import { addOBBLayer } from '../../../../Renderer/ThreeExtended/OBBHelper';
+import GlobeControls from '../../../../Renderer/ThreeExtended/GlobeControls';
 
 var sceneIsLoaded = false;
 var eventLoaded = new CustomEvent('globe-loaded');
@@ -403,7 +404,10 @@ ApiGlobe.prototype.createSceneGlobe = function createSceneGlobe(globeLayerId, co
     var gLDebug = false; // true to support GLInspector addon
     var debugMode = false;
 
-    var positionCamera = new C.EPSG_4326(coordCarto.longitude, coordCarto.latitude, coordCarto.altitude);
+    var positionCamera = new C.EPSG_4326(
+        coordCarto.longitude,
+        coordCarto.latitude,
+        coordCarto.altitude);
 
     this.scene = Scene(positionCamera, ellipsoidSizes(), viewerDiv, debugMode, gLDebug);
 
@@ -458,6 +462,25 @@ ApiGlobe.prototype.createSceneGlobe = function createSceneGlobe(globeLayerId, co
     if (__DEBUG__) {
         addOBBLayer(wgs84TileLayer, this.scene);
     }
+
+    const size = ellipsoidSizes().x;
+
+    // Init camera
+    this.scene.camera.camera3D.near = Math.max(15.0, 0.000002352 * size);
+    this.scene.camera.camera3D.far = size * 10;
+    this.scene.camera.camera3D.updateProjectionMatrix();
+    this.scene.camera.camera3D.updateMatrixWorld(true);
+
+    // Create Control
+    this.scene.controls = new GlobeControls(
+        this.scene.camera.camera3D,
+        this.scene.gfxEngine.renderer.domElement,
+        this.scene.gfxEngine);
+    this.scene.controls.rotateSpeed = 0.25;
+    this.scene.controls.zoomSpeed = 2.0;
+    this.scene.controls.minDistance = 30;
+    this.scene.controls.maxDistance = size * 8.0;
+    this.scene.controls.addEventListener('change', this.scene.gfxEngine.update);
 
     return wgs84TileLayer;
 };
