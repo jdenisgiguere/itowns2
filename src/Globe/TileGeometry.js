@@ -90,7 +90,7 @@ TileGeometry.prototype.computeBuffers = function computeBuffers(params, builder)
 
     // Read previously cached values
     var cachedBuffers = cache.getRessource(params.segment);
-    if (false && cachedBuffers) {
+    if (cachedBuffers) {
         outBuffers.index = cachedBuffers.index;
         outBuffers.uv.wgs84 = cachedBuffers.uv.wgs84;
     } else {
