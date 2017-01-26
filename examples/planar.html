@@ -53,6 +53,7 @@ and open the template in the editor.
             // create default scene
             var scene = new itowns.Scene(viewerDiv, false, false);
             scene.initDefaultProviders();
+            scene.scheduler.addProtocolProvider('3d-tiles', new itowns.ThreeDTiles_Provider());
 
             // add plane geometry layer
             const epsg3946TileLayer = {
@@ -73,6 +74,72 @@ and open the template in the editor.
 
             scene.addLayer(epsg3946TileLayer);
 
+
+            // TODO: temporary, move elsewhere
+            fetch('http://3d.oslandia.com/proto-building/getScene?city=lyon&layer=buildings&representations=lod1,lod2&weights=10,20').then((response) => {
+                response.json().then((tileset) => {
+                    const tileset2dict = function(root, dict) {
+                        let id = 0;
+                        const recurse = function(node) {
+                            dict[id] = node;
+                            node.tileId = id;
+                            id++
+                            for(let child in node.children) {
+                                recurse(node.children[child], dict)
+                            }
+                        }
+                        recurse(root);
+                    }
+
+                    let tileIndex = {};
+                    tileset2dict(tileset.root, tileIndex);
+
+                    // add 3d-tiles layer
+                    const threeDTilesLayer = {
+                        protocol: '3d-tiles',
+                        id: 'test 3d-tiles',
+                        update: itowns.updateTreeLayer,//(context, layer, node) => itowns.processing.tree.update(itowns.processing.threeDTiles.update, context, layer, node),
+                        processNode: itowns.process3DTilesNode,
+                        initLevel0Nodes: itowns.init3DTilesLayer,
+                        // nodeType: TileMesh,
+                        lvl0Nodes: tileset.root.children,
+                        tileIndex,
+                        url: 'http://3d.oslandia.com/proto-building/',
+                        initRootNodes: itowns.init3DTilesLayer,
+                        cullingTest: itowns.threeDTilesCulling,
+                        preUpdate: (context, layer) => itowns.pre3DTilesUpdate(context, layer),
+                        mustSubdivide: itowns.threeDTilesSubdivisionControl,
+                        // TODO: add a layer to be able to use Camera.layers feature
+                    };
+
+                    scene.addLayer(threeDTilesLayer);
+
+                    // debug
+                    const debugIdUpdate = function debugIdUpdate(context, layer, node) {
+                        var n = node.children.filter(n => n.layer == debugLayer.id);
+                        if (node.visible) {
+                            if (n.length == 0) {
+                                n = new itowns.THREE.BoxHelper(node.boundingVolume.box, `id:${node.id}`);
+                                n.layer = debugLayer.id;
+                                node.add(n);
+                                n.update(node.boundingVolume.box);
+                            } else {
+                                n = n[0];
+                            }
+                            n.visible = true;
+                        }
+                        if (n.length > 0) {
+                            n[0].visible = false;
+                        }
+                    };
+
+                    const debugLayer = {
+                        id: 'tile_ids',
+                        update: debugIdUpdate,
+                    };
+                    scene.addLayer(debugLayer, threeDTilesLayer.id);
+                })
+            });
 
             scene.addLayer({
                 url       : "https://download.data.grandlyon.com/wms/grandlyon",

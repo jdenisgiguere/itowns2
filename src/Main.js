@@ -16,8 +16,10 @@ export { planeCulling, planeSubdivisionControl, planeSchemeTile } from './Proces
 export { updateTreeLayer } from './Process/TreeLayerProcessing';
 export { processTiledGeometryNode, initTiledGeometryLayer } from './Process/TiledNodeProcessing';
 export { updateLayeredMaterialNodeImagery, updateLayeredMaterialNodeElevation, initNewNode } from './Process/LayeredMaterialNodeProcessing';
+export { process3DTilesNode, init3DTilesLayer, threeDTilesCulling, threeDTilesSubdivisionControl, pre3DTilesUpdate } from './Process/ThreeDTilesProcessing';
 export { TileMesh } from './Globe/TileMesh';
 export { PlanarCameraControls } from './Renderer/ThreeExtended/PlanarCameraControls';
+export { ThreeDTiles_Provider } from './Core/Commander/Providers/ThreeDTiles_Provider';
 
 // This is temporary, until we're able to build a vendor.js
 // containing our dependencies.
