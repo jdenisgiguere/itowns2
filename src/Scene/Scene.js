@@ -12,6 +12,10 @@ import Scheduler from '../Core/Commander/Scheduler';
 import StyleManager from './Description/StyleManager';
 import LayersConfiguration from './LayersConfiguration';
 import Camera from '../Renderer/Camera';
+import WMTS_Provider from '../Core/Commander/Providers/WMTS_Provider';
+import WMS_Provider from '../Core/Commander/Providers/WMS_Provider';
+import TileProvider from '../Core/Commander/Providers/TileProvider';
+import { STRATEGY_MIN_NETWORK_TRAFFIC } from './LayerUpdateStrategy';
 
 var instanceScene = null;
 
@@ -28,6 +32,7 @@ function Scene(viewerDiv, debugMode, gLDebug) {
         viewerDiv.clientWidth * (debugMode ? 0.5 : 1.0),
         viewerDiv.clientHeight,
         debugMode);
+
 
     this.selectNodes = null;
     this.scheduler = Scheduler(this);
@@ -61,6 +66,66 @@ function Scene(viewerDiv, debugMode, gLDebug) {
 
 Scene.prototype.constructor = Scene;
 
+
+Scene.prototype.initDefaultProviders = function initDefaultProviders() {
+    var gLDebug = false; // true to support GLInspector addon
+
+    // Register all providers
+    var wmtsProvider = new WMTS_Provider({
+        support: gLDebug,
+    });
+
+    this.scheduler.addProtocolProvider('wmts', wmtsProvider);
+    this.scheduler.addProtocolProvider('wmtsc', wmtsProvider);
+    this.scheduler.addProtocolProvider('tile', new TileProvider());
+    this.scheduler.addProtocolProvider('wms', new WMS_Provider({ support: gLDebug }));
+};
+
+
+/**
+ * This function gives a chance to the matching provider to pre-process some
+ * values for a layer.
+ */
+function preprocessLayer(scene, layer, provider) {
+    if (!layer.updateStrategy) {
+        layer.updateStrategy = {
+            type: STRATEGY_MIN_NETWORK_TRAFFIC,
+        };
+    }
+
+    if (provider) {
+        if (provider.tileInsideLimit) {
+            layer.tileInsideLimit = provider.tileInsideLimit.bind(provider);
+        }
+
+        if (provider.tileTextureCount) {
+            layer.tileTextureCount = provider.tileTextureCount.bind(provider);
+        }
+
+        if (provider.preprocessDataLayer) {
+            provider.preprocessDataLayer(layer);
+        }
+    }
+
+    // probably not the best place to do this
+    if (provider instanceof TileProvider || !provider) {
+        const threejsLayer = scene.getUniqueThreejsLayer();
+        console.log(threejsLayer);
+        scene.layersConfiguration.setLayerAttribute(layer.id, 'threejsLayer', threejsLayer);
+        // enable by default
+        scene.camera.camera3D.layers.enable(threejsLayer);
+    } else {
+        scene.layersConfiguration.setLayerAttribute(layer.id, 'frozen', false);
+        scene.layersConfiguration.setLayerAttribute(layer.id, 'visible', true);
+        scene.layersConfiguration.setLayerAttribute(layer.id, 'opacity', 1.0);
+        scene.layersConfiguration.setLayerAttribute(layer.id, 'sequence', 0);
+    }
+}
+
+Scene.prototype.addLayer = function addLayer(layer, parentLayerId) {
+    this.layersConfiguration.addLayer(layer, parentLayerId);
+    preprocessLayer(this, layer, this.scheduler.getProtocolProvider(layer.protocol));
+};
 
 /**
  * @documentation: return current camera
@@ -268,7 +333,4 @@ Scene.prototype.getUniqueThreejsLayer = function getUniqueThreejsLayer() {
     return result;
 };
 
-export default function (viewerDiv, debugMode, gLDebug) {
-    instanceScene = instanceScene || new Scene(viewerDiv, debugMode, gLDebug);
-    return instanceScene;
-}
+export default Scene;

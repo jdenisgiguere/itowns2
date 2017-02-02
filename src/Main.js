@@ -6,6 +6,7 @@
 
 import ApiGlobe from './Core/Commander/Interfaces/ApiInterface/ApiGlobe';
 import { addOBBLayer } from './Renderer/ThreeExtended/OBBHelper';
+import Scene from './Scene/Scene';
 
 // browser execution or not ?
 const scope = typeof window !== 'undefined' ? window : {};
@@ -19,4 +20,5 @@ const itowns = scope.itowns || {
 scope.itowns = itowns;
 export const viewer = itowns.viewer;
 export const obb = itowns.obb;
+export { Scene };
 export default scope.itowns;
