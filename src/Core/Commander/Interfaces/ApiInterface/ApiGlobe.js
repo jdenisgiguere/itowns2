@@ -379,7 +379,9 @@ ApiGlobe.prototype.createSceneGlobe = function createSceneGlobe(globeLayerId, co
         coordCarto.latitude,
         coordCarto.altitude);
 
-    this.scene = Scene(positionCamera, ellipsoidSizes(), viewerDiv, debugMode, gLDebug);
+    this.scene = Scene(viewerDiv, debugMode, gLDebug);
+    this.scene.camera.setPosition(positionCamera.as('EPSG:4978').xyz());
+    this.scene.camera.camera3D.lookAt({ x: 0, y: 0, z: 0 });
 
     this.initProviders(this.scene);
 
@@ -445,14 +447,46 @@ ApiGlobe.prototype.createSceneGlobe = function createSceneGlobe(globeLayerId, co
     this.scene.controls = new GlobeControls(
         this.scene.camera.camera3D,
         this.scene.gfxEngine.renderer.domElement,
-        this.scene.gfxEngine);
+        this.scene.gfxEngine,
+        size);
     this.scene.controls.rotateSpeed = 0.25;
     this.scene.controls.zoomSpeed = 2.0;
     this.scene.controls.minDistance = 30;
     this.scene.controls.maxDistance = size * 8.0;
+
     this.scene.controls.addEventListener('change', this.scene.gfxEngine.update);
 
     return wgs84TileLayer;
+};
+
+ApiGlobe.prototype.createScene = function createScene(viewerDiv) {
+    this.viewerDiv = viewerDiv;
+
+    viewerDiv.addEventListener('globe-built', () => {
+        if (sceneIsLoaded === false) {
+            sceneIsLoaded = true;
+            this.scene.currentControls().updateCameraTransformation();
+            this.scene.updateScene3D();
+            viewerDiv.dispatchEvent(eventLoaded);
+        } else {
+            viewerDiv.dispatchEvent(eventError);
+        }
+    }, false);
+
+    var gLDebug = false; // true to support GLInspector addon
+    var debugMode = false;
+
+    this.scene = Scene(viewerDiv, debugMode, gLDebug);
+
+    this.initProviders(this.scene);
+
+    this.sceneLoadedDeferred = defer();
+    this.addEventListener('globe-loaded', () => {
+        this.sceneLoadedDeferred.resolve();
+        this.sceneLoadedDeferred = defer();
+    });
+
+    return this.scene;
 };
 
 ApiGlobe.prototype.update = function update() {
