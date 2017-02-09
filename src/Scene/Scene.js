@@ -110,7 +110,6 @@ function preprocessLayer(scene, layer, provider) {
     // probably not the best place to do this
     if (provider instanceof TileProvider || !provider) {
         const threejsLayer = scene.getUniqueThreejsLayer();
-        console.log(threejsLayer);
         scene.layersConfiguration.setLayerAttribute(layer.id, 'threejsLayer', threejsLayer);
         // enable by default
         scene.camera.camera3D.layers.enable(threejsLayer);
