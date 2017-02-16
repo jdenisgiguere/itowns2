@@ -73,16 +73,16 @@ ThreeDTiles_Provider.prototype.geojsonToMesh = function geojsonToMesh(geoJson) {
         const color = /* new THREE.Color(Math.random(),Math.random(),Math.random());//*/new THREE.Color(180 / 255, 147 / 255, 128 / 255);
 
         if (geoJson.geometries.features[0].properties.zmax !== undefined) {
-            const height = geoJson.geometries.features[0].properties.zmax - geoJson.geometries.features[0].properties.zmin;
             let shape = new THREE.Shape();
-            var extrudeSettings = {
-                amount: height,
-                bevelEnabled: true,
-                bevelThickness: height / 10,
-                bevelSize: height / 10,
-                bevelSegments: 2,
-            };
             for (let r = 0; r < features.length; r++) {
+                const height = geoJson.geometries.features[r].properties.zmax - geoJson.geometries.features[r].properties.zmin;
+                const extrudeSettings = {
+                    amount: height,
+                    bevelEnabled: true,
+                    bevelThickness: height / 10,
+                    bevelSize: height / 10,
+                    bevelSegments: 2,
+                };
                 const coords = features[r].geometry.coordinates;
                 for (let i = 0; i < coords.length; i++) {
                     const polygon = coords[i][0]; // TODO: support holes
@@ -93,14 +93,15 @@ ThreeDTiles_Provider.prototype.geojsonToMesh = function geojsonToMesh(geoJson) {
                     // shape creation
                     shape = new THREE.Shape(pathPoints);
                     if (geometry) {
-                        geometry.merge(new THREE.ExtrudeGeometry(shape, extrudeSettings));
+                        const geometry2 = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                        geometry2.translate(0, 0, geoJson.geometries.features[r].properties.zmin);
+                        geometry.merge(geometry2);
                     } else {
                         geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                        geometry.translate(0, 0, geoJson.geometries.features[r].properties.zmin);
                     }
                 }
             }
-
-            geometry.translate(0, 0, geoJson.geometries.features[0].properties.zmin);
             geometry.computeBoundingSphere();
         } else {
             const threeData = geoJsonToThree.convert(geoJson);
