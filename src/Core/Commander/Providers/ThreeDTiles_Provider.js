@@ -13,6 +13,32 @@ import { UNIT } from '../../Geographic/Coordinates';
 import FeatureMesh from '../../../Renderer/FeatureMesh';
 import BoundingBox from '../../../Scene/BoundingBox';
 
+
+export function ThreeDTilesIndex(tileset) {
+    let counter = 0;
+    this.index = {};
+    const recurse = function recturse(node) {
+        this.index[counter] = node;
+        node.tileId = counter;
+        counter++;
+        for (const child of node.children) {
+            recurse(child);
+        }
+    }.bind(this);
+    recurse(tileset.root);
+
+    this.extendTileset = function extendTileset(tileset, parentId, nodeId) {
+        recurse(tileset.root);
+        const parent = this.index[parentId];
+        for (let i = 0; i < parent.children.length; i++) {
+            if (parent.children[i].tileId === nodeId) {
+                parent.children[i] = tileset.root;
+                break;
+            }
+        }
+    };
+}
+
 function ThreeDTiles_Provider(/* options*/) {
     // Constructor
 
@@ -151,7 +177,7 @@ ThreeDTiles_Provider.prototype.executeCommand = function executeCommand(command)
 
     const urlSuffix = metadata.content ? metadata.content.url : undefined;
     if (urlSuffix) {
-        const url = layer.url + urlSuffix;
+        const url = layer.urlPrefix + urlSuffix;
 
         const supportedFormats = {
             geoJson: this.geojsonToMesh.bind(this),
@@ -163,13 +189,18 @@ ThreeDTiles_Provider.prototype.executeCommand = function executeCommand(command)
                 let func = supportedFormats.b3dm;
                 const firstChar = String.fromCharCode((new Uint8Array(result, 0, 1))[0]);
                 if (firstChar === '{') {
-                    func = supportedFormats.geoJson;
                     result = JSON.parse(convertUint8ArrayToString(new Uint8Array(result)));
+                    if (result.asset) {
+                        layer.tileIndex.extendTileset(result, parent.tileId, metadata.tileId);
+                        return;
+                    } else {
+                        func = supportedFormats.geoJson;
+                    }
                 }
                 return func(result).then((tile) => {
                     configureTile(tile, layer, metadata);
                     if (parent) {
-                        // TODO: move this elsewhare
+                        // TODO: move this elsewhere
                         parent.add(tile);
                     }
                     tile.updateMatrixWorld();

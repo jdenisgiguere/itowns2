@@ -1,3 +1,6 @@
+import Fetcher from '../Core/Commander/Providers/Fetcher';
+import { ThreeDTilesIndex } from '../Core/Commander/Providers/ThreeDTiles_Provider';
+
 function requestNewTile(scheduler, geometryLayer, metadata, parent) {
     const command = {
         /* mandatory */
@@ -16,7 +19,7 @@ function subdivideNode(context, layer, node) {
     if (!node.pendingSubdivision2 && node.children.filter(n => n.layer == layer.id).length == 0) {
         node.pendingSubdivision2 = true;
 
-        const childrenTiles = layer.tileIndex[node.tileId].children;
+        const childrenTiles = layer.tileIndex.index[node.tileId].children;
         if (childrenTiles === undefined) {
             return;
         }
@@ -85,15 +88,19 @@ export function init3DTilesLayer(context, layer) {
 
     layer.level0Nodes = [];
 
-    for (let i = 0; i < layer.lvl0Nodes.length; i++) {
-        requestNewTile(context.scheduler, layer, layer.lvl0Nodes[i], undefined).then(
-            (node) => {
-                // TODO: support a layer.root attribute, to be able
-                // to add a layer to a three.js node
-                context.scene.gfxEngine.scene3D.add(node);
-                layer.level0Nodes.push(node);
-            });
-    }
+    Fetcher.json(layer.url).then((tileset) => {
+        layer.tileIndex = new ThreeDTilesIndex(tileset);
+        const lvl0Tiles = tileset.root.children;
+        for (let i = 0; i < lvl0Tiles.length; i++) {
+            requestNewTile(context.scheduler, layer, lvl0Tiles[i], undefined).then(
+                (node) => {
+                    // TODO: support a layer.root attribute, to be able
+                    // to add a layer to a three.js node
+                    context.scene.gfxEngine.scene3D.add(node);
+                    layer.level0Nodes.push(node);
+                });
+        }
+    });
 }
 
 export function process3DTilesNode(context, layer, node) {
