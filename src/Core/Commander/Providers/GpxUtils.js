@@ -6,7 +6,7 @@
 
 import * as THREE from 'three';
 import Fetcher from './Fetcher';
-import Coordinates from '../../Geographic/Coordinates';
+import { Coordinates } from '../../Geographic/Coordinates';
 import ItownsLine from './ItownsLine';
 import ItownsPoint from './ItownsPoint';
 

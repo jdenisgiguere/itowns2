@@ -17,7 +17,7 @@ import * as THREE from 'three';
 import Earcut from 'earcut';
 import Provider from './Provider';
 import WFS_Provider from './WFS_Provider';
-import Coordinates, { C } from '../../Geographic/Coordinates';
+import { Coordinates, C } from '../../Geographic/Coordinates';
 
 function BuildingBox_Provider(options) {
     // Constructor

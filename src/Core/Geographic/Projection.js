@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import CoordWMTS from './CoordWMTS';
 import MathExt from '../Math/MathExtended';
-import Coordinates, { UNIT } from './Coordinates';
+import { Coordinates, UNIT } from './Coordinates';
 
 
 function Projection() {

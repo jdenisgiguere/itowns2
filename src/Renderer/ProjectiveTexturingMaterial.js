@@ -12,7 +12,7 @@ import graphicEngine from './c3DEngine';
 import Ori from '../MobileMapping/Ori';
 import Shader from '../MobileMapping/Shader';
 import Ellipsoid from '../Core/Math/Ellipsoid';
-import Coordinates from '../Core/Geographic/Coordinates';
+import { Coordinates } from '../Core/Geographic/Coordinates';
 
 window.requestAnimSelectionAlpha = (function getRequestAnimSelectionAlphaFn() {
     return window.requestAnimationFrame ||
