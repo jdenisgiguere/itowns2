@@ -42,6 +42,8 @@ module.exports = {
         body: 1
       }
     }],
+    // we can't use default export because it breaks Main.js
+    'import/prefer-default-export': 'off',
     'one-var': ['error', 'never'],
     // TODO reactivate this rule once a proper npm package is made
     // a good configuration might be:

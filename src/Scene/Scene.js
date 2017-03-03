@@ -332,4 +332,4 @@ Scene.prototype.getUniqueThreejsLayer = function getUniqueThreejsLayer() {
     return result;
 };
 
-export default Scene;
+export { Scene };

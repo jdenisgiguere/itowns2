@@ -11,7 +11,7 @@ import IoDriver_XBIL from './IoDriver_XBIL';
 import Fetcher from './Fetcher';
 import Projection from '../../Geographic/Projection';
 import CacheRessource from './CacheRessource';
-import BoundingBox from '../../../Scene/BoundingBox';
+import { BoundingBox } from '../../../Scene/BoundingBox';
 
 /**
  * Return url wmts MNT

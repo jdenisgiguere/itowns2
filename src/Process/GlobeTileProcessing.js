@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import SchemeTile from '../Scene/SchemeTile';
 import MathExt from '../Core/Math/MathExtended';
 import { UNIT, ellipsoidSizes } from '../Core/Geographic/Coordinates';
-import BoundingBox from '../Scene/BoundingBox';
+import { BoundingBox } from '../Scene/BoundingBox';
 
 const cV = new THREE.Vector3();
 let vhMagnitudeSquared;

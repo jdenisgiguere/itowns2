@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import OBB from '../Renderer/ThreeExtended/OBB';
-import Coordinates from '../Core/Geographic/Coordinates';
+import { Coordinates } from '../Core/Geographic/Coordinates';
 
 function PlanarTileBuilder() {
 
@@ -54,4 +54,4 @@ PlanarTileBuilder.prototype.OBB = function _OBB(params) {
     return new OBB(min, max, normal, translate);
 };
 
-export default PlanarTileBuilder;
+export { PlanarTileBuilder };

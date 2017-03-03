@@ -235,4 +235,4 @@ TileMesh.prototype.changeSequenceLayers = function changeSequenceLayers(sequence
     this.materials[RendererConstant.FINAL].setSequence(sequence);
 };
 
-export default TileMesh;
+export { TileMesh };

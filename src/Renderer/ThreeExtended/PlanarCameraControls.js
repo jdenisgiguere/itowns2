@@ -471,4 +471,4 @@ PlanarCameraControls.prototype.onMouseMove = function onMouseMove(event) {
         { scope.handleMouseMovePan(event); }
 };
 
-export default PlanarCameraControls;
+export { PlanarCameraControls };

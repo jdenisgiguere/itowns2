@@ -5,7 +5,7 @@
  */
 
 import * as THREE from 'three';
-import Coordinates, { crsToUnit, crsIsGeographic, assertCrsIsValid } from '../Core/Geographic/Coordinates';
+import { Coordinates, crsToUnit, crsIsGeographic, assertCrsIsValid } from '../Core/Geographic/Coordinates';
 
 /**
  *
@@ -168,4 +168,4 @@ BoundingBox.prototype.intersect = function intersect(bbox) {
              this.north() <= other.south());
 };
 
-export default BoundingBox;
+export { BoundingBox };

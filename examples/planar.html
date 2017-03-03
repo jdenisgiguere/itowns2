@@ -39,8 +39,8 @@ and open the template in the editor.
             /* global itowns,document,GuiTools*/
             const viewerDiv = document.getElementById('viewerDiv');
 
-            itowns.proj4.defs('EPSG:3946',
-                '+proj=lcc +lat_1=45.25 +lat_2=46.75 +lat_0=46 +lon_0=3 +x_0=1700000 +y_0=5200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
+            // itowns.proj4.defs('EPSG:3946',
+            //     '+proj=lcc +lat_1=45.25 +lat_2=46.75 +lat_0=46 +lon_0=3 +x_0=1700000 +y_0=5200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
 
             const menuGlobe = new GuiTools(itowns.viewer, 'menuDiv');
 
@@ -57,17 +57,17 @@ and open the template in the editor.
             const epsg3946TileLayer = {
                 protocol: 'tile',
                 id: 'lyon',
-                update: itowns.processing.tree.update,
-                processNode: itowns.processing.tile.update,
+                update: itowns.updateTreeLayer,
+                processNode: itowns.processTiledGeometryNode,
                 nodeType: itowns.TileMesh,
                 maxLevel: 6,
                 /* tile process */
-                initLevel0Nodes: itowns.processing.tile.init(),
-                schemeTile: itowns.processing.plane.schemeTile(bbox),
-                cullingTest: itowns.processing.plane.culling,
-                initNewNode: itowns.processing.layeredMaterial.init,
-                mustSubdivide: itowns.processing.plane.subdivisionControl,
-                builder: new itowns.builder.planar(),
+                initLevel0Nodes: itowns.initTiledGeometryLayer(),
+                schemeTile: itowns.planeSchemeTile(bbox),
+                cullingTest: itowns.planeCulling,
+                initNewNode: itowns.initNewNode,
+                mustSubdivide: itowns.planeSubdivisionControl,
+                builder: new itowns.PlanarTileBuilder(),
             };
 
             scene.addLayer(epsg3946TileLayer);
@@ -95,7 +95,7 @@ and open the template in the editor.
                 options: {
                     mimetype  : "image/jpeg"
                 },
-                update: itowns.processing.layeredMaterial.update_imagery,
+                update: itowns.updateLayeredMaterialNodeImagery,
             }, epsg3946TileLayer.id);
             scene.layersConfiguration.setLayerAttribute('wms_imagery', 'type', 'color');
 
@@ -118,7 +118,7 @@ and open the template in the editor.
                     minmaxElevation: [0, 255],
                     mimetype  : "image/jpeg"
                 },
-                update: itowns.processing.layeredMaterial.update_elevation,
+                update: itowns.updateLayeredMaterialNodeElevation,
             }, epsg3946TileLayer.id);
             scene.layersConfiguration.setLayerAttribute('wms_elevation', 'type', 'elevation');
 
@@ -128,7 +128,7 @@ and open the template in the editor.
             scene.camera.update();
             scene.camera.camera3D.updateProjectionMatrix();
 
-            var controls = scene.controls = new itowns.controls.planar(
+            var controls = scene.controls = new itowns.PlanarCameraControls(
                 scene.camera.camera3D,
                 scene.gfxEngine.renderer.domElement,
                 scene.gfxEngine
@@ -150,7 +150,7 @@ and open the template in the editor.
             scene.notifyChange();
 
             itowns.debug = new Debug(scene);
-            var debugLayer = itowns.obb.addHelper(epsg3946TileLayer, scene);
+            var debugLayer = itowns.addOBBLayer(epsg3946TileLayer, scene);
             itowns.debug.addGeometryVisibilityCheckbox(debugLayer, scene);
         </script>
     </body>

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import BoundingBox from '../Scene/BoundingBox';
+import { BoundingBox } from '../Scene/BoundingBox';
 
 
 function subdivisionBoundingBoxes(bbox) {

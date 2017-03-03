@@ -5,17 +5,17 @@
  */
 
 import CustomEvent from 'custom-event';
-import Scene from '../../../../Scene/Scene';
+import { Scene } from '../../../../Scene/Scene';
 import loadGpx from '../../Providers/GpxUtils';
 import { C, ellipsoidSizes } from '../../../Geographic/Coordinates';
 import Projection from '../../../Geographic/Projection';
 import Fetcher from '../../Providers/Fetcher';
-import updateTreeLayer from '../../../../Process/TreeLayerProcessing';
+import { updateTreeLayer } from '../../../../Process/TreeLayerProcessing';
 import { processTiledGeometryNode, initTiledGeometryLayer } from '../../../../Process/TiledNodeProcessing';
 import { updateLayeredMaterialNodeImagery, updateLayeredMaterialNodeElevation, initNewNode } from '../../../../Process/LayeredMaterialNodeProcessing';
 import { globeCulling, preGlobeUpdate, globeSubdivisionControl, globeSchemeTileWMTS, globeSchemeTile1 } from '../../../../Process/GlobeTileProcessing';
 import BuilderEllipsoidTile from '../../../../Globe/BuilderEllipsoidTile';
-import TileMesh from '../../../../Globe/TileMesh';
+import { TileMesh } from '../../../../Globe/TileMesh';
 import Atmosphere from '../../../../Globe/Atmosphere';
 import Clouds from '../../../../Globe/Clouds';
 import CoordStars from '../../../../Core/Geographic/CoordStars';
@@ -1012,4 +1012,4 @@ ApiGlobe.prototype.loadGPX = function loadGPX(url) {
     this.scene.renderScene3D();
 };
 
-export default ApiGlobe;
+export { ApiGlobe };
