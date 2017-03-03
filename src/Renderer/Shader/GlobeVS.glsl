@@ -38,6 +38,7 @@ void main() {
         vUv_PM = uv_pm;
 
         vec4 vPosition;
+        vNormal = normal;
 
         if(loadedTexturesCount[0] > 0)
         {
@@ -67,7 +68,6 @@ void main() {
         } else {
             vPosition = vec4( position ,1.0 );
         }
-        vNormal = normal;
 
         mat4 projModelViewMatrix = useRTC ? mVPMatRTC : projectionMatrix * modelViewMatrix;
 
