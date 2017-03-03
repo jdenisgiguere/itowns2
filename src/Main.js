@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+import * as THREE from 'three';
+import proj4 from 'proj4';
 
-export { proj4 } from 'proj4';
 export { ApiGlobe } from './Core/Commander/Interfaces/ApiInterface/ApiGlobe';
 export { addOBBLayer } from './Renderer/ThreeExtended/OBBHelper';
 export { Scene } from './Scene/Scene';
@@ -17,3 +18,8 @@ export { processTiledGeometryNode, initTiledGeometryLayer } from './Process/Tile
 export { updateLayeredMaterialNodeImagery, updateLayeredMaterialNodeElevation, initNewNode } from './Process/LayeredMaterialNodeProcessing';
 export { TileMesh } from './Globe/TileMesh';
 export { PlanarCameraControls } from './Renderer/ThreeExtended/PlanarCameraControls';
+
+// This is temporary, until we're able to build a vendor.js
+// containing our dependencies.
+export { THREE };
+export { proj4 };
