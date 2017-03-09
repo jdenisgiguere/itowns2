@@ -38,13 +38,13 @@ void main() {
         vUv_PM = uv_pm;
 
         vec4 vPosition;
-        vNormal = normal;
+        vNormal = vec3(0,0,1);//normal;
 
         if(loadedTexturesCount[0] > 0)
         {
             vec2    vVv = vec2(
                 vUv_WGS84.x * offsetScale_L00[0].z + offsetScale_L00[0].x,
-                (1.0 - vUv_WGS84.y) * offsetScale_L00[0].z + offsetScale_L00[0].y);
+                (vUv_WGS84.y) * offsetScale_L00[0].z + offsetScale_L00[0].y);
 
 
             #ifdef RGBA_ELEVATION
@@ -61,7 +61,7 @@ void main() {
                     dv = 0.0;
 
             #else
-                float   dv  = max(texture2D( dTextures_00[0], vVv ).w, 0.);
+                float   dv  = texture2D( dTextures_00[0], vVv ).x * 255.0;//max(texture2D( dTextures_00[0], vVv ).w, 0.);
             #endif
 
             vPosition   = vec4( position +  vNormal  * dv ,1.0 );
