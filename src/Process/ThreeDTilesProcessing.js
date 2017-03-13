@@ -1,12 +1,13 @@
 import Fetcher from '../Core/Commander/Providers/Fetcher';
 import { ThreeDTilesIndex } from '../Core/Commander/Providers/ThreeDTiles_Provider';
 
-function requestNewTile(scheduler, geometryLayer, metadata, parent) {
+function requestNewTile(scheduler, geometryLayer, metadata, parent, camera) {
+    const distance = parent ? camera.camera3D.position.distanceTo(parent.boundingVolume.box.getCenter()) : 0;
     const command = {
         /* mandatory */
         requester: parent,
         layer: geometryLayer,
-        priority: 10000,
+        priority: 10000 - distance / 100,
         /* specific params */
         metadata,
         redraw: false,
@@ -27,7 +28,7 @@ function subdivideNode(context, layer, node) {
         const promises = [];
         for (let i = 0; i < childrenTiles.length; i++) {
             promises.push(
-                requestNewTile(context.scheduler, layer, childrenTiles[i], node).then(() => {
+                requestNewTile(context.scheduler, layer, childrenTiles[i], node, context.camera).then(() => {
                     if (node.additiveRefinement) {
                         context.scene.notifyChange(0, true);
                     }
@@ -92,7 +93,7 @@ export function init3DTilesLayer(context, layer) {
         layer.tileIndex = new ThreeDTilesIndex(tileset);
         const lvl0Tiles = tileset.root.children;
         for (let i = 0; i < lvl0Tiles.length; i++) {
-            requestNewTile(context.scheduler, layer, lvl0Tiles[i], undefined).then(
+            requestNewTile(context.scheduler, layer, lvl0Tiles[i], undefined, context.camera).then(
                 (node) => {
                     // TODO: support a layer.root attribute, to be able
                     // to add a layer to a three.js node
