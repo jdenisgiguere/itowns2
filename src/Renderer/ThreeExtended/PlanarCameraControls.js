@@ -50,6 +50,7 @@ function PlanarCameraControls(camera, domElement, engine) {
     scope = this;
 
     this.camera = camera;
+    camera.up.set(0, 0, 1);
     this.domElement = domElement;
     this.engine = engine;
 
