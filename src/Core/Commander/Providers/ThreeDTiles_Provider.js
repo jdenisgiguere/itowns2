@@ -11,6 +11,7 @@ import Fetcher from './Fetcher';
 import geoJsonToThree from '../../../Renderer/ThreeExtended/GeoJSONToThree';
 import { UNIT } from '../../Geographic/Coordinates';
 import FeatureMesh from '../../../Renderer/FeatureMesh';
+import FeatureMaterial from '../../../Renderer/FeatureMaterial';
 import BoundingBox from '../../../Scene/BoundingBox';
 
 
@@ -144,7 +145,13 @@ ThreeDTiles_Provider.prototype.geojsonToMesh = function geojsonToMesh(geoJson) {
 
 ThreeDTiles_Provider.prototype.b3dmToMesh = function b3dmToMesh(data) {
     // TODO: change shaders?
-    return this.b3dmLoader.parse(data).then(result => result.scene);
+    return this.b3dmLoader.parse(data).then((result) => {
+        const setMaterial = function setMaterial(mesh) {
+            mesh.material = new FeatureMaterial();
+        };
+        result.scene.traverse(setMaterial);
+        return result.scene;
+    });
 };
 
 // Taken from Three
