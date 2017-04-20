@@ -94,15 +94,15 @@ function getTransform(transform, parent) {
 
 ThreeDTiles_Provider.prototype.geojsonToMesh = function geojsonToMesh(geoJson) {
     return new Promise((resolve) => {
-        const features = geoJson.geometries.features;
+        const features = geoJson.features;
 
         let geometry;
         const color = /* new THREE.Color(Math.random(),Math.random(),Math.random());//*/new THREE.Color(180 / 255, 147 / 255, 128 / 255);
 
-        if (geoJson.geometries.features[0].properties.zmax !== undefined) {
+        if (features[0].properties.zmax !== undefined) {
             let shape = new THREE.Shape();
             for (let r = 0; r < features.length; r++) {
-                const height = geoJson.geometries.features[r].properties.zmax - geoJson.geometries.features[r].properties.zmin;
+                const height = features[r].properties.zmax - features[r].properties.zmin;
                 const extrudeSettings = {
                     amount: height,
                     bevelEnabled: true,
@@ -121,11 +121,11 @@ ThreeDTiles_Provider.prototype.geojsonToMesh = function geojsonToMesh(geoJson) {
                     shape = new THREE.Shape(pathPoints);
                     if (geometry) {
                         const geometry2 = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-                        geometry2.translate(0, 0, geoJson.geometries.features[r].properties.zmin);
+                        geometry2.translate(0, 0, features[r].properties.zmin);
                         geometry.merge(geometry2);
                     } else {
                         geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-                        geometry.translate(0, 0, geoJson.geometries.features[r].properties.zmin);
+                        geometry.translate(0, 0, features[r].properties.zmin);
                     }
                 }
             }
